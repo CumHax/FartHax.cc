@@ -1,25 +1,34 @@
 package me.cumhax.fart.module.movement;
 
-import me.cumhax.fart.event.PacketEvent;
+import me.cumhax.fart.friend.PacketReceiveEvent;
 import me.cumhax.fart.module.Category;
 import me.cumhax.fart.module.Module;
 import net.minecraft.network.play.server.SPacketEntityVelocity;
 import net.minecraft.network.play.server.SPacketExplosion;
-import team.stiff.pomelo.impl.annotated.handler.annotation.Listener;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.gameevent.TickEvent;
 
-public class Velocity extends Module {
+public class Velocity extends Module
+{
+	public Velocity() {
+		super("Velocity", "", Category.MOVEMENT);
+	}
 
-    public Velocity() {
-        super ( "Velocity", "", Category.MOVEMENT);
-    }
-
-    @Listener
-    public void listener(PacketEvent.Receive event) {
-        if (event.getPacket() instanceof SPacketEntityVelocity) {
-            if (((SPacketEntityVelocity) event.getPacket()).getEntityID() == mc.player.getEntityId())
-                event.setCanceled(true);
+	@SubscribeEvent
+	public void onPacket(PacketReceiveEvent event)
+	{
+		if(nullCheck()) return;
+		if (event.getPacket() instanceof SPacketEntityVelocity) 
+		{
+            if (((SPacketEntityVelocity) event.getPacket()).getEntityID() == mc.player.getEntityId()) event.setCanceled(true);
         }
-        if (event.getPacket() instanceof SPacketExplosion)
-            event.setCanceled(true);
+        if (event.getPacket() instanceof SPacketExplosion) event.setCanceled(true);
+    }
+	
+	@SubscribeEvent
+    public void onUpdate(TickEvent.ClientTickEvent event) 
+	{
+        if(nullCheck()) return;
+        this.mc.player.entityCollisionReduction = 1.0f;
     }
 }
